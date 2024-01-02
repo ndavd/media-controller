@@ -238,7 +238,6 @@ impl MediaControllerApp {
         let filled_count = progress as usize;
         let middle_count = (percentage != 100) as usize;
         let empty_count = 10_usize.saturating_sub(progress as usize).saturating_sub(1);
-        println!("{filled_count} {middle_count} {empty_count}");
         let progress_str = std::iter::repeat(full)
             .take(filled_count)
             .chain(

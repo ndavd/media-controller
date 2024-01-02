@@ -1,9 +1,19 @@
 # Media Controller
 
-Handles the display of volume/brightness control.
+`media-controller` provides a GTK-3 always-on-top window with transparency
+support that displays the current volume/brightness right after changing it
+accordingly.
+
+It makes use of UNIX sockets so that if another instance is created while the
+first one is running, it doesn't create another window and simply updates the
+value of the other providing a smooth experience.
+
+![Demo](https://raw.githubusercontent.com/ndavd/media-controller/main/.github/demo.gif)
+
+[Options used in the demo: `--color=#000000aa --font-description="BigBlueTerm437 Nerd Font Mono"`]
 
 ```
-media-controller v0.1.0
+media-controller v0.2.0
 Nuno David <email@ndavd.com>
 
 USAGE:
@@ -23,9 +33,15 @@ Format --{option}={value}
     empty               Empty character used in the window content. Default: " "
 ```
 
-In order to make it work in your system simply modify it to your liking, all it
-takes to integrate are some agnostic function implementations. Your `main.rs`
-should look something like this:
+In order to make it work in your system simply create a new cargo project. Add
+the library:
+
+```
+cargo add media-controller
+```
+
+And then all it takes is implementing some functions. Your `main.rs` should look
+something like this:
 
 ```rust
 /// Should toggle mute.
@@ -70,7 +86,12 @@ fn main() {
 }
 ```
 
-Here's a basic example of how to use it with `sxhkd`:
+A concrete example for a Linux system that uses `wpctl` and `brightnessctl` can
+be found at
+[src/main.rs](https://github.com/ndavd/media-controller/blob/main/src/main.rs).
+
+It is then particularly useful to map `media-controller` to your media keys.
+Using `sxhkd` it should look something like this:
 
 ```
 # Volume Control
@@ -86,16 +107,4 @@ XF86MonBrightnessDown
   media-controller b down 5
 XF86MonBrightnessUp
   media-controller b up 5
-```
-
-Installing:
-
-```
-cargo install --path .
-```
-
-Uninstalling:
-
-```
-cargo uninstall media-controller
 ```

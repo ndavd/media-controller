@@ -1,5 +1,3 @@
-use media_controller;
-
 const WPCTL: &str = "wpctl";
 const AUDIO_SINK: &str = "@DEFAULT_AUDIO_SINK@";
 
