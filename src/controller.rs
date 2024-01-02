@@ -219,6 +219,6 @@ impl MediaControllerApp {
             }))
             .chain(std::iter::repeat(EMPTY).take(10_usize.saturating_sub(progress as usize)))
             .collect::<String>();
-        format!("{progress_str}{percentage:0>3}%")
+        format!("{progress_str}{percentage:>3}%")
     }
 }
