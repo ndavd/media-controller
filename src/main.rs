@@ -1,6 +1,4 @@
-mod cli;
-mod controller;
-mod window;
+use media_controller;
 
 const WPCTL: &str = "wpctl";
 const AUDIO_SINK: &str = "@DEFAULT_AUDIO_SINK@";
@@ -8,14 +6,14 @@ const AUDIO_SINK: &str = "@DEFAULT_AUDIO_SINK@";
 const BRIGHTNESSCTL: &str = "brightnessctl";
 
 fn main() {
-    controller::MediaControllerApp {
+    media_controller::MediaControllerApp {
         toggle_mute,
         get_mute,
         get_volume,
         get_brightness,
         inc_volume,
         inc_brightness,
-        controller: None,
+        custom_controller: None,
     }
     .run();
 }

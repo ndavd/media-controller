@@ -2,7 +2,7 @@ use gtk::glib::{ControlFlow, Propagation};
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow};
 
-use crate::controller::{Color, MediaController};
+use crate::{Color, MediaController};
 
 fn set_visual(window: &ApplicationWindow, _screen: Option<&gtk::gdk::Screen>) {
     if let Some(screen) = GtkWindowExt::screen(window) {

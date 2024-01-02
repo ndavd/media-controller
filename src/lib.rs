@@ -1,9 +1,10 @@
-use crate::{
-    cli::{FromArgs, PrintUsage, NAME},
-    window::spawn_window,
-};
+mod cli;
+mod window;
+
+use cli::{FromArgs, PrintUsage, NAME};
 use fs2::FileExt;
 use std::io::{Read, Write};
+use window::spawn_window;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum Action {
@@ -132,8 +133,8 @@ pub struct MediaControllerApp {
 }
 impl MediaControllerApp {
     pub fn run(&self) {
-        let controller = match self.custom_controller {
-            Some(controller) => controller,
+        let controller = match &self.custom_controller {
+            Some(controller) => controller.clone(),
             None => match MediaController::from_args() {
                 Some(controller) => controller,
                 None => {
