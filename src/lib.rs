@@ -235,15 +235,22 @@ impl MediaControllerApp {
     fn _progress(percentage: u8, full: char, half_full: char, empty: char) -> String {
         assert!(percentage <= 100);
         let progress = percentage as f32 / 10.0;
+        let filled_count = progress as usize;
+        let middle_count = (percentage != 100) as usize;
+        let empty_count = 10_usize.saturating_sub(progress as usize).saturating_sub(1);
+        println!("{filled_count} {middle_count} {empty_count}");
         let progress_str = std::iter::repeat(full)
-            .take(progress as usize)
-            .chain(std::iter::once(if (progress.ceil() - progress) >= 0.5 {
-                half_full
-            } else {
-                empty
-            }))
-            .chain(std::iter::repeat(empty).take(10_usize.saturating_sub(progress as usize)))
+            .take(filled_count)
+            .chain(
+                std::iter::repeat(if progress.ceil() - progress >= 0.5 {
+                    half_full
+                } else {
+                    empty
+                })
+                .take(middle_count),
+            )
+            .chain(std::iter::repeat(empty).take(empty_count))
             .collect::<String>();
-        format!("{progress_str}{percentage:>3}%")
+        format!("{progress_str}{percentage:>4}%")
     }
 }
