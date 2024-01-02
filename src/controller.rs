@@ -35,8 +35,8 @@ pub struct Color {
 }
 impl std::default::Default for Color {
     fn default() -> Self {
-        let f = 0.05;
-        Self::new(f, f, f, 0.8)
+        let f = 0.0;
+        Self::new(f, f, f, 1.0)
     }
 }
 impl std::fmt::Display for Color {
@@ -87,21 +87,25 @@ pub struct MediaController {
     pub width: u32,
     pub height: u32,
     pub bottom: u32,
-    pub duration: u32,
+    pub duration: f32,
 }
 impl std::default::Default for MediaController {
     fn default() -> Self {
         Self {
             action: Action::default(),
             color: Color::default(),
-            font_description: "Monospace 15".to_string(),
-            width: 400,
-            height: 30,
+            font_description: "Monospace 13".to_string(),
+            width: 300,
+            height: 20,
             bottom: 100,
-            duration: 2,
+            duration: 2.0,
         }
     }
 }
+
+const FULL: char = '█';
+const HALF_FULL: char = '▌';
+const EMPTY: char = ' ';
 
 pub struct MediaControllerApp {
     pub get_mute: fn() -> bool,
@@ -113,7 +117,6 @@ pub struct MediaControllerApp {
 
     pub toggle_mute: fn(),
 }
-
 impl MediaControllerApp {
     pub fn run(&self) {
         let controller = match MediaController::from_args() {
@@ -132,7 +135,8 @@ impl MediaControllerApp {
             Action::BrightnessDown(v) => (self.inc_brightness)(-(v as i8)),
         };
 
-        let label = self.label(controller.action);
+        let label_text = self.label(controller.action);
+        println!("{label_text}");
 
         let lock_p = format!("/tmp/{}.lock", NAME);
         let socket_p = format!("/tmp/{}.sock", NAME);
@@ -147,14 +151,17 @@ impl MediaControllerApp {
             println!("Another instance is already running. Updating existing window...");
             std::os::unix::net::UnixStream::connect(socket_p)
                 .unwrap()
-                .write_all(label.as_bytes())
+                .write_all(label_text.as_bytes())
                 .unwrap();
             return;
         }
 
-        let shared = std::sync::Arc::new(std::sync::Mutex::new(label.clone()));
+        let shared = std::sync::Arc::new(std::sync::Mutex::new(label_text.clone()));
+
+        let kill_countdown = std::sync::Arc::new(std::sync::Mutex::new(1));
 
         let shared_2 = shared.clone();
+        let kill_countdown_2 = kill_countdown.clone();
         std::thread::spawn(move || {
             let _ = std::fs::remove_file(&socket_p);
             let listener = std::os::unix::net::UnixListener::bind(socket_p).unwrap();
@@ -165,11 +172,25 @@ impl MediaControllerApp {
                     let data = std::str::from_utf8(&b[..data_size]).unwrap();
                     println!("Received from another instance: {}", data);
                     let mut label = shared_2.lock().unwrap();
+                    let mut kill_countdown = kill_countdown_2.lock().unwrap();
+                    *kill_countdown = if *kill_countdown >= 2 {
+                        2
+                    } else {
+                        *kill_countdown + 1
+                    };
                     *label = data.to_string();
                     stream.shutdown(std::net::Shutdown::Both).unwrap();
                     drop(stream);
                 }
             }
+        });
+        std::thread::spawn(move || {
+            while *kill_countdown.lock().unwrap() != 0 {
+                std::thread::sleep(std::time::Duration::from_secs_f32(controller.duration));
+                *kill_countdown.lock().unwrap() -= 1;
+            }
+            println!("Closing...");
+            std::process::exit(0);
         });
 
         spawn_window(controller.clone(), shared);
@@ -188,11 +209,16 @@ impl MediaControllerApp {
     }
     fn _progress(percentage: u8) -> String {
         assert!(percentage <= 100);
-        let progress = (percentage / 10) as usize;
-        let progress_str = std::iter::repeat('█')
-            .take(progress)
-            .chain(std::iter::repeat(' ').take(10 - progress))
+        let progress = percentage as f32 / 10.0;
+        let progress_str = std::iter::repeat(FULL)
+            .take(progress as usize)
+            .chain(std::iter::once(if (progress.ceil() - progress) >= 0.5 {
+                HALF_FULL
+            } else {
+                EMPTY
+            }))
+            .chain(std::iter::repeat(EMPTY).take(10_usize.saturating_sub(progress as usize)))
             .collect::<String>();
-        format!("{progress_str} {percentage}%")
+        format!("{progress_str}{percentage:0>3}%")
     }
 }

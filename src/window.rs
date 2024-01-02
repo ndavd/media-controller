@@ -1,4 +1,4 @@
-use gtk::glib::{Propagation, ControlFlow};
+use gtk::glib::{ControlFlow, Propagation};
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow};
 
@@ -59,8 +59,9 @@ fn build_ui(
     win.connect_draw(move |win, ctx| draw(win, ctx, color));
 
     let label = gtk::Label::new(None);
+
     label.set_text(&shared.lock().unwrap());
-    label.set_yalign(0.0);
+    label.set_valign(gtk::Align::Center);
     let attr = gtk::pango::AttrList::new();
     attr.insert(gtk::pango::AttrFontDesc::new(
         &gtk::pango::FontDescription::from_string(&controller.font_description),
@@ -68,9 +69,13 @@ fn build_ui(
     label.set_attributes(Some(&attr));
     win.add(&label);
 
-    gtk::glib::timeout_add_seconds(controller.duration, move || {
-        println!("Closing...");
-        std::process::exit(0);
+    gtk::glib::timeout_add_local(std::time::Duration::from_millis(10), move || {
+        if let Ok(shared) = shared.lock() {
+            if label.text().as_str() != shared.as_str() {
+                label.set_text(&shared);
+            }
+        }
+        ControlFlow::Continue
     });
 
     win.show_all();

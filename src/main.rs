@@ -29,7 +29,7 @@ fn run_get_volume_output() -> String {
 }
 
 fn get_formatted_value(value: i8) -> String {
-    format!("{}%{}", value.abs(), if value < 0 { "-" } else { "+" })
+    format!("{}%{}", value.abs(), if value < 0 { '-' } else { '+' })
 }
 
 fn get_mute() -> bool {
@@ -63,10 +63,10 @@ fn toggle_mute() {
 }
 
 fn inc_volume(inc: i8) {
+    force_mute(false);
     if inc > 0 && get_volume() >= 100 {
         return;
     }
-    force_mute(false);
     std::process::Command::new(WPCTL)
         .args(["set-volume", AUDIO_SINK, &get_formatted_value(inc)])
         .output()
@@ -75,6 +75,7 @@ fn inc_volume(inc: i8) {
 fn get_brightness() -> u8 {
     std::fs::read_to_string("/sys/class/backlight/nvidia_0/brightness")
         .unwrap()
+        .trim()
         .parse()
         .unwrap()
 }

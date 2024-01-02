@@ -86,7 +86,7 @@ impl FromArgs for MediaController {
                     }
                 }
                 "duration" => {
-                    if let Ok(parsed) = value.parse::<u32>() {
+                    if let Ok(parsed) = value.parse::<f32>() {
                         controller.duration = parsed;
                         continue;
                     }
