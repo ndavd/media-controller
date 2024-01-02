@@ -75,7 +75,8 @@ impl FromArgs for MediaController {
             }
             action_i += 1;
             let (option, value) = arg.split_once('=')?;
-            match &option[2..] {
+            let option = &option[2..];
+            match option {
                 "width" | "height" | "bottom" => {
                     if let Ok(parsed) = value.parse::<u32>() {
                         match option {

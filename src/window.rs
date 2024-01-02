@@ -61,7 +61,6 @@ fn build_ui(
     let label = gtk::Label::new(None);
 
     label.set_text(&shared.lock().unwrap());
-    label.set_valign(gtk::Align::Center);
     let attr = gtk::pango::AttrList::new();
     attr.insert(gtk::pango::AttrFontDesc::new(
         &gtk::pango::FontDescription::from_string(&controller.font_description),
