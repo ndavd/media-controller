@@ -15,6 +15,7 @@ fn main() {
         get_brightness,
         inc_volume,
         inc_brightness,
+        controller: None,
     }
     .run();
 }

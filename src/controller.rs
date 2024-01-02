@@ -110,23 +110,37 @@ impl std::default::Default for MediaController {
 }
 
 pub struct MediaControllerApp {
+    /// Should return whether it's muted.
     pub get_mute: fn() -> bool,
+
+    /// Should return the volume (0-100).
     pub get_volume: fn() -> u8,
+    /// Should return the brightness (0-100).
     pub get_brightness: fn() -> u8,
 
+    /// Should increment the volume. To decrement use a negative value.
     pub inc_volume: fn(i8),
+    /// Should increment the brightness. To decrement use a negative value.
     pub inc_brightness: fn(i8),
 
+    /// Should toggle mute.
     pub toggle_mute: fn(),
+
+    /// Pass `Some` to use custom options.
+    /// Pass `None` to manage them through command line arguments.
+    pub custom_controller: Option<MediaController>,
 }
 impl MediaControllerApp {
     pub fn run(&self) {
-        let controller = match MediaController::from_args() {
+        let controller = match self.custom_controller {
             Some(controller) => controller,
-            None => {
-                MediaController::print();
-                return;
-            }
+            None => match MediaController::from_args() {
+                Some(controller) => controller,
+                None => {
+                    MediaController::print();
+                    return;
+                }
+            },
         };
 
         match controller.action {

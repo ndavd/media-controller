@@ -28,25 +28,35 @@ takes to integrate are some agnostic function implementations. Your `main.rs`
 should look something like this:
 
 ```rust
+/// Should toggle mute.
 fn toggle_mute() {
     todo!();
 }
+/// Should return whether it's muted.
 fn get_mute() -> bool {
     todo!();
 }
+/// Should return the volume (0-100).
 fn get_volume() -> u8 {
     todo!();
 }
+/// Should return the brightness (0-100).
 fn get_brightness() -> u8 {
     todo!();
 }
+/// Should increment the volume. To decrement use a negative value.
 fn inc_volume(value: i8) {
     todo!();
 }
+/// Should increment the brightness. To decrement use a negative value.
 fn inc_brightness(value: i8) {
     todo!();
 }
 fn main() {
+    /// Pass `Some` to use custom options.
+    /// Pass `None` to manage them through command line arguments.
+    let custom_controller = None;
+
     controller::MediaControllerApp {
         toggle_mute,
         get_mute,
@@ -54,6 +64,7 @@ fn main() {
         get_brightness,
         inc_volume,
         inc_brightness,
+        custom_controller,
     }
     .run();
 }
@@ -78,11 +89,13 @@ XF86MonBrightnessUp
 ```
 
 Installing:
+
 ```
 cargo install --path .
 ```
 
 Uninstalling:
+
 ```
 cargo uninstall media-controller
 ```
