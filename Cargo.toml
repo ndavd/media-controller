@@ -3,6 +3,12 @@ name = "media-controller"
 version = "0.1.0"
 edition = "2021"
 authors = ["Nuno David <email@ndavd.com>"]
+license = "MIT"
+description = "A setup agnostic media controller"
+readme = ".github/README.md"
+repository = "https://github.com/ndavd/media-controller"
+exclude = [".github/workflows"]
+categories = ["graphics", "visualization", "multimedia::audio"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
