@@ -41,6 +41,18 @@ impl PrintUsage for MediaController {
             "{TAB}font-description{TAB}Font used. {def_str}\"{}\"",
             default_controller.font_description
         );
+        println!(
+            "{TAB}filled          {TAB}Filled character used in the window content. {def_str}\"{}\"",
+            default_controller.filled
+        );
+        println!(
+            "{TAB}half-filled     {TAB}Half filled character used in the window content. {def_str}\"{}\"",
+            default_controller.half_filled
+        );
+        println!(
+            "{TAB}empty           {TAB}Empty character used in the window content. {def_str}\"{}\"",
+            default_controller.empty
+        );
         println!("\n");
     }
 }
@@ -88,6 +100,24 @@ impl FromArgs for MediaController {
                 "duration" => {
                     if let Ok(parsed) = value.parse::<f32>() {
                         controller.duration = parsed;
+                        continue;
+                    }
+                }
+                "filled" => {
+                    if let Ok(parsed) = value.parse::<char>() {
+                        controller.filled = parsed;
+                        continue;
+                    }
+                }
+                "half-filled" => {
+                    if let Ok(parsed) = value.parse::<char>() {
+                        controller.half_filled = parsed;
+                        continue;
+                    }
+                }
+                "empty" => {
+                    if let Ok(parsed) = value.parse::<char>() {
+                        controller.empty = parsed;
                         continue;
                     }
                 }

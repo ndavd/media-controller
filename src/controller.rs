@@ -88,6 +88,9 @@ pub struct MediaController {
     pub height: u32,
     pub bottom: u32,
     pub duration: f32,
+    pub filled: char,
+    pub half_filled: char,
+    pub empty: char,
 }
 impl std::default::Default for MediaController {
     fn default() -> Self {
@@ -99,13 +102,12 @@ impl std::default::Default for MediaController {
             height: 20,
             bottom: 100,
             duration: 2.0,
+            filled: '█',
+            half_filled: '▌',
+            empty: ' ',
         }
     }
 }
-
-const FULL: char = '█';
-const HALF_FULL: char = '▌';
-const EMPTY: char = ' ';
 
 pub struct MediaControllerApp {
     pub get_mute: fn() -> bool,
@@ -135,7 +137,12 @@ impl MediaControllerApp {
             Action::BrightnessDown(v) => (self.inc_brightness)(-(v as i8)),
         };
 
-        let label_text = self.label(controller.action);
+        let label_text = self.label(
+            controller.action,
+            controller.filled,
+            controller.half_filled,
+            controller.empty,
+        );
         println!("{label_text}");
 
         let lock_p = format!("/tmp/{}.lock", NAME);
@@ -195,29 +202,32 @@ impl MediaControllerApp {
 
         spawn_window(controller.clone(), shared);
     }
-    pub fn label(&self, action: Action) -> String {
+    pub fn label(&self, action: Action, full: char, half_full: char, empty: char) -> String {
         let is_volume = action.is_volume_kind();
         if !is_volume {
             let brightness = (self.get_brightness)();
-            return format!("BRT: {}", Self::_progress(brightness));
+            return format!(
+                "BRT: {}",
+                Self::_progress(brightness, full, half_full, empty)
+            );
         }
         if (self.get_mute)() {
             return "MUTED".to_string();
         }
         let volume = (self.get_volume)();
-        return format!("VOL: {}", Self::_progress(volume));
+        return format!("VOL: {}", Self::_progress(volume, full, half_full, empty));
     }
-    fn _progress(percentage: u8) -> String {
+    fn _progress(percentage: u8, full: char, half_full: char, empty: char) -> String {
         assert!(percentage <= 100);
         let progress = percentage as f32 / 10.0;
-        let progress_str = std::iter::repeat(FULL)
+        let progress_str = std::iter::repeat(full)
             .take(progress as usize)
             .chain(std::iter::once(if (progress.ceil() - progress) >= 0.5 {
-                HALF_FULL
+                half_full
             } else {
-                EMPTY
+                empty
             }))
-            .chain(std::iter::repeat(EMPTY).take(10_usize.saturating_sub(progress as usize)))
+            .chain(std::iter::repeat(empty).take(10_usize.saturating_sub(progress as usize)))
             .collect::<String>();
         format!("{progress_str}{percentage:>3}%")
     }
