@@ -11,11 +11,12 @@ accordingly.
 
 It makes use of UNIX sockets so that if another instance is created while the
 first one is running, it doesn't create another window and simply updates the
-value of the other providing a smooth experience.
+content of the existing one providing a smooth experience.
 
 ![Demo](https://raw.githubusercontent.com/ndavd/media-controller/main/.github/demo.gif)
 
-[Options used in the demo: `--color=#000000aa --font-description="BigBlueTerm437 Nerd Font Mono"`]
+[Options used in the demo:
+`--color=#000000aa --font-description="BigBlueTerm437 Nerd Font Mono"`]
 
 ```
 media-controller v0.2.1
@@ -45,7 +46,7 @@ the library:
 cargo add media-controller
 ```
 
-And then all it takes is implementing some functions. Your `main.rs` should look
+Then all it takes is implementing some functions. Your `main.rs` should look
 something like this:
 
 ```rust
@@ -95,8 +96,8 @@ A concrete example for a Linux system that uses `wpctl` and `brightnessctl` can
 be found at
 [src/main.rs](https://github.com/ndavd/media-controller/blob/main/src/main.rs).
 
-It is then particularly useful to map `media-controller` to your media keys.
-Using `sxhkd` it should look something like this:
+It is particularly useful to map `media-controller` to your media keys. E.g.
+using `sxhkd`:
 
 ```
 # Volume Control
