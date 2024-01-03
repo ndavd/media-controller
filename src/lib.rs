@@ -1,7 +1,7 @@
 mod cli;
 mod window;
 
-use cli::{FromArgs, PrintUsage, NAME};
+use cli::{Cli, NAME};
 use fs2::FileExt;
 use std::io::{Read, Write};
 use window::spawn_window;
@@ -138,7 +138,7 @@ impl MediaControllerApp {
             None => match MediaController::from_args() {
                 Some(controller) => controller,
                 None => {
-                    MediaController::print();
+                    MediaController::print_usage();
                     return;
                 }
             },

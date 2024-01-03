@@ -18,7 +18,7 @@ value of the other providing a smooth experience.
 [Options used in the demo: `--color=#000000aa --font-description="BigBlueTerm437 Nerd Font Mono"`]
 
 ```
-media-controller v0.2.0
+media-controller v0.2.1
 Nuno David <email@ndavd.com>
 
 USAGE:
@@ -33,9 +33,9 @@ Format --{option}={value}
     bottom              Offset from the bottom of the screen in px. Default: 100
     color               Color of the window in hex (#RRGGBB or #RRGGBBAA). Default: "#000000FF"
     font-description    Font used. Default: "Monospace 13"
-    filled              Filled character used in the window content. Default: "█"
-    half-filled         Half filled character used in the window content. Default: "▌"
-    empty               Empty character used in the window content. Default: " "
+    filled              Filled character used in the progress bar. Default: "█"
+    half-filled         Half filled character used in the progress bar. Default: "▌"
+    empty               Empty character used in the progress bar. Default: " "
 ```
 
 In order to make it work in your system simply create a new cargo project. Add
