@@ -22,12 +22,7 @@ fn realize(win: &ApplicationWindow, width: i32, bottom: i32) {
     let gdk_win = win.window().unwrap();
     gdk_win.set_override_redirect(true);
 
-    let monitor_geometry = gdk_win
-        .screen()
-        .display()
-        .primary_monitor()
-        .unwrap()
-        .geometry();
+    let monitor_geometry = gdk_win.display().primary_monitor().unwrap().geometry();
 
     win.move_(
         monitor_geometry.width() / 2 - width / 2,
