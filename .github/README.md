@@ -1,5 +1,10 @@
 # Media Controller
 
+<div>
+  <img alt="Crates.io Version" src="https://img.shields.io/crates/v/media-controller?style=flat-square">
+</div>
+<br/>
+
 `media-controller` provides a GTK-3 always-on-top window with transparency
 support that displays the current volume/brightness right after changing it
 accordingly.
