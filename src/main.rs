@@ -30,7 +30,7 @@ fn get_formatted_value(value: i8) -> String {
 }
 
 fn get_mute() -> bool {
-    run_get_volume_output().find("MUTED").is_some()
+    run_get_volume_output().contains("MUTED")
 }
 
 fn get_volume() -> u8 {
