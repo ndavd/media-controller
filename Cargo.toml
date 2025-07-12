@@ -10,8 +10,12 @@ repository = "https://github.com/ndavd/media-controller"
 exclude = [".github/workflows"]
 categories = ["graphics", "visualization", "multimedia::audio"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+regular = ["gtk"]
+wayland = ["gtk4", "gtk4-layer-shell"]
 
 [dependencies]
 fs2 = "0.4.3"
-gtk = "0.18.1"
+gtk = { version = "0.18.1", optional = true }
+gtk4 = { version = "0.9.7", optional = true }
+gtk4-layer-shell = { version = "0.5.0", optional = true }

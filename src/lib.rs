@@ -1,10 +1,16 @@
 mod cli;
+
+#[cfg(feature = "regular")]
 mod window;
+#[cfg(feature = "wayland")]
+mod wl_window;
 
 use cli::{Cli, NAME};
 use fs2::FileExt;
 use std::io::{Read, Write};
-use window::spawn_window;
+
+#[cfg(all(feature = "regular", feature = "wayland"))]
+compile_error!("Features \"regular\" and \"wayland\" cannot be enabled at the same time");
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum Action {
@@ -215,7 +221,11 @@ impl MediaControllerApp {
             std::process::exit(0);
         });
 
-        spawn_window(controller.clone(), shared);
+        #[cfg(feature = "regular")]
+        window::spawn_window(controller.clone(), shared);
+
+        #[cfg(feature = "wayland")]
+        wl_window::spawn_wl_window(controller.clone(), shared);
     }
     pub fn label(&self, action: Action, full: char, half_full: char, empty: char) -> String {
         let is_volume = action.is_volume_kind();
