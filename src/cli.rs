@@ -102,6 +102,8 @@ impl Cli for MediaController {
             2 => {
                 if action_args[0] == "v" && action_args[1] == "mute" {
                     Some(Action::VolumeToggleMute)
+                } else if action_args[0] == "m" && action_args[1] == "mute" {
+                    Some(Action::MicrophoneToggleMute)
                 } else {
                     None
                 }
@@ -129,6 +131,7 @@ impl Cli for MediaController {
         println!("{AUTHORS}");
         println!("\nUSAGE:");
         println!("{TAB}{NAME} [OPTIONS] v up|down|mute {{number}}");
+        println!("{TAB}{NAME} [OPTIONS] m mute");
         println!("{TAB}{NAME} [OPTIONS] b up|down {{number}}");
         println!("\nOPTIONS:");
         println!("Format --{{option}}={{value}}");

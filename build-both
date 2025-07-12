@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# This script builds both versions into /target/release
+
+cargo b --release --features regular && \
+  mv ./target/release/media-controller ./target/release/regular-media-controller
+
+cargo b --release --features wayland && \
+  mv ./target/release/media-controller ./target/release/wayland-media-controller

@@ -24,11 +24,12 @@ In order to build the binary or the library you must pick a Cargo feature:
   have [`gtk-layer-shell`](https://github.com/wmww/gtk-layer-shell) installed)
 
 ```
-media-controller v0.2.1
+media-controller v0.3.1
 Nuno David <email@ndavd.com>
 
 USAGE:
     media-controller [OPTIONS] v up|down|mute {number}
+    media-controller [OPTIONS] m mute
     media-controller [OPTIONS] b up|down {number}
 
 OPTIONS:
@@ -51,54 +52,8 @@ project and add the library with the respective feature enabled:
 cargo add media-controller --features wayland
 ```
 
-Then all it takes is implementing some functions. Your `main.rs` should look
-something like this:
-
-```rust
-/// Should toggle mute.
-fn toggle_mute() {
-    todo!();
-}
-/// Should return whether it's muted.
-fn get_mute() -> bool {
-    todo!();
-}
-/// Should return the volume (0-100).
-fn get_volume() -> u8 {
-    todo!();
-}
-/// Should return the brightness (0-100).
-fn get_brightness() -> u8 {
-    todo!();
-}
-/// Should increment the volume. To decrement use a negative value.
-fn inc_volume(value: i8) {
-    todo!();
-}
-/// Should increment the brightness. To decrement use a negative value.
-fn inc_brightness(value: i8) {
-    todo!();
-}
-fn main() {
-    /// Pass `Some` to use custom options.
-    /// Pass `None` to manage them through command line arguments.
-    let custom_controller = None;
-
-    controller::MediaControllerApp {
-        toggle_mute,
-        get_mute,
-        get_volume,
-        get_brightness,
-        inc_volume,
-        inc_brightness,
-        custom_controller,
-    }
-    .run();
-}
-```
-
-A concrete example for a Linux system that uses `wpctl` and `brightnessctl` can
-be found at
+Then all it takes is implementing some functions. A concrete example for a Linux
+system that uses `wpctl` and `brightnessctl` can be found at
 [src/main.rs](https://github.com/ndavd/media-controller/blob/main/src/main.rs).
 
 It is particularly useful to map `media-controller` to your media keys. E.g.

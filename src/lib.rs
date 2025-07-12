@@ -16,6 +16,7 @@ compile_error!("Features \"regular\" and \"wayland\" cannot be enabled at the sa
 pub enum Action {
     #[default]
     VolumeToggleMute,
+    MicrophoneToggleMute,
     VolumeUp(u8),
     VolumeDown(u8),
     BrightnessUp(u8),
@@ -24,6 +25,7 @@ pub enum Action {
 impl Action {
     fn is_volume_kind(&self) -> bool {
         match self {
+            Self::MicrophoneToggleMute => true,
             Self::VolumeToggleMute => true,
             Self::VolumeUp(_) => true,
             Self::VolumeDown(_) => true,
@@ -117,8 +119,11 @@ impl std::default::Default for MediaController {
 }
 
 pub struct MediaControllerApp {
-    /// Should return whether it's muted.
-    pub get_mute: fn() -> bool,
+    /// Should return whether the volume is muted.
+    pub get_volume_mute: fn() -> bool,
+
+    /// Should return whether the microphone is muted.
+    pub get_microphone_mute: fn() -> bool,
 
     /// Should return the volume (0-100).
     pub get_volume: fn() -> u8,
@@ -130,8 +135,11 @@ pub struct MediaControllerApp {
     /// Should increment the brightness. To decrement use a negative value.
     pub inc_brightness: fn(i8),
 
-    /// Should toggle mute.
-    pub toggle_mute: fn(),
+    /// Should toggle volume mute.
+    pub toggle_volume_mute: fn(),
+
+    /// Should toggle microphone mute.
+    pub toggle_microphone_mute: fn(),
 
     /// Pass `Some` to use custom options.
     /// Pass `None` to manage them through command line arguments.
@@ -153,7 +161,8 @@ impl MediaControllerApp {
         match controller.action {
             Action::VolumeUp(v) => (self.inc_volume)(v as i8),
             Action::VolumeDown(v) => (self.inc_volume)(-(v as i8)),
-            Action::VolumeToggleMute => (self.toggle_mute)(),
+            Action::VolumeToggleMute => (self.toggle_volume_mute)(),
+            Action::MicrophoneToggleMute => (self.toggle_microphone_mute)(),
             Action::BrightnessUp(v) => (self.inc_brightness)(v as i8),
             Action::BrightnessDown(v) => (self.inc_brightness)(-(v as i8)),
         };
@@ -227,6 +236,13 @@ impl MediaControllerApp {
         wl_window::spawn_wl_window(controller.clone(), shared);
     }
     pub fn label(&self, action: Action, full: char, half_full: char, empty: char) -> String {
+        if matches!(action, Action::MicrophoneToggleMute) {
+            if (self.get_microphone_mute)() {
+                return "MIC OFF".to_string();
+            } else {
+                return "MIC ON".to_string();
+            }
+        }
         let is_volume = action.is_volume_kind();
         if !is_volume {
             let brightness = (self.get_brightness)();
@@ -235,7 +251,7 @@ impl MediaControllerApp {
                 Self::_progress(brightness, full, half_full, empty)
             );
         }
-        if (self.get_mute)() {
+        if (self.get_volume_mute)() {
             return "MUTED".to_string();
         }
         let volume = (self.get_volume)();

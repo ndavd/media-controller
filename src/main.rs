@@ -1,12 +1,15 @@
 const WPCTL: &str = "wpctl";
 const AUDIO_SINK: &str = "@DEFAULT_AUDIO_SINK@";
+const AUDIO_SOURCE: &str = "@DEFAULT_AUDIO_SOURCE@";
 
 const BRIGHTNESSCTL: &str = "brightnessctl";
 
 fn main() {
     media_controller::MediaControllerApp {
-        toggle_mute,
-        get_mute,
+        toggle_volume_mute,
+        get_volume_mute,
+        toggle_microphone_mute,
+        get_microphone_mute,
         get_volume,
         get_brightness,
         inc_volume,
@@ -25,12 +28,25 @@ fn run_get_volume_output() -> String {
     String::from_utf8(stdout).unwrap()
 }
 
+fn run_get_microphone_volume_output() -> String {
+    let stdout = std::process::Command::new(WPCTL)
+        .args(["get-volume", AUDIO_SOURCE])
+        .output()
+        .unwrap()
+        .stdout;
+    String::from_utf8(stdout).unwrap()
+}
+
 fn get_formatted_value(value: i8) -> String {
     format!("{}%{}", value.abs(), if value < 0 { '-' } else { '+' })
 }
 
-fn get_mute() -> bool {
+fn get_volume_mute() -> bool {
     run_get_volume_output().contains("MUTED")
+}
+
+fn get_microphone_mute() -> bool {
+    run_get_microphone_volume_output().contains("MUTED")
 }
 
 fn get_volume() -> u8 {
@@ -52,9 +68,16 @@ fn force_mute(mute: bool) {
         .unwrap();
 }
 
-fn toggle_mute() {
+fn toggle_volume_mute() {
     std::process::Command::new(WPCTL)
         .args(["set-mute", AUDIO_SINK, "toggle"])
+        .output()
+        .unwrap();
+}
+
+fn toggle_microphone_mute() {
+    std::process::Command::new(WPCTL)
+        .args(["set-mute", AUDIO_SOURCE, "toggle"])
         .output()
         .unwrap();
 }
