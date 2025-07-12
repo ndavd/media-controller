@@ -138,7 +138,7 @@ impl Cli for MediaController {
             .max_by(|a, b| a.len().cmp(&b.len()))
             .unwrap()
             .len();
-        let pad = |s: &str| format!("{:biggest_arg_len$}", s);
+        let pad = |s: &str| format!("{s:biggest_arg_len$}");
 
         println!(
             "{TAB}{}{TAB}Lifespan of the window in seconds. {def_str}{}",

@@ -70,7 +70,7 @@ impl Color {
             return None;
         }
         let chars_vec = chars.collect::<Vec<_>>();
-        let mut chunks = chars_vec.chunks(2).map(|c| String::from_iter(c));
+        let mut chunks = chars_vec.chunks(2).map(String::from_iter);
         let parse_chunk = |chunk: Option<String>| -> Option<f32> {
             if let Some(chunk) = chunk {
                 let integer_representation = u8::from_str_radix(&chunk, 16).ok()?;
@@ -166,12 +166,13 @@ impl MediaControllerApp {
         );
         println!("{label_text}");
 
-        let lock_p = format!("/tmp/{}.lock", NAME);
-        let socket_p = format!("/tmp/{}.sock", NAME);
+        let lock_p = format!("/tmp/{NAME}.lock");
+        let socket_p = format!("/tmp/{NAME}.sock");
 
         let lock = std::fs::OpenOptions::new()
             .write(true)
             .create(true)
+            .truncate(true)
             .open(lock_p)
             .unwrap();
 
@@ -193,23 +194,21 @@ impl MediaControllerApp {
         std::thread::spawn(move || {
             let _ = std::fs::remove_file(&socket_p);
             let listener = std::os::unix::net::UnixListener::bind(socket_p).unwrap();
-            for stream in listener.incoming() {
-                if let Ok(mut stream) = stream {
-                    let mut b = [0; 1024];
-                    let data_size = stream.read(&mut b).unwrap();
-                    let data = std::str::from_utf8(&b[..data_size]).unwrap();
-                    println!("Received from another instance: {}", data);
-                    let mut label = shared_2.lock().unwrap();
-                    let mut kill_countdown = kill_countdown_2.lock().unwrap();
-                    *kill_countdown = if *kill_countdown >= 2 {
-                        2
-                    } else {
-                        *kill_countdown + 1
-                    };
-                    *label = data.to_string();
-                    stream.shutdown(std::net::Shutdown::Both).unwrap();
-                    drop(stream);
-                }
+            for mut stream in listener.incoming().flatten() {
+                let mut b = [0; 1024];
+                let data_size = stream.read(&mut b).unwrap();
+                let data = std::str::from_utf8(&b[..data_size]).unwrap();
+                println!("Received from another instance: {data}");
+                let mut label = shared_2.lock().unwrap();
+                let mut kill_countdown = kill_countdown_2.lock().unwrap();
+                *kill_countdown = if *kill_countdown >= 2 {
+                    2
+                } else {
+                    *kill_countdown + 1
+                };
+                *label = data.to_string();
+                stream.shutdown(std::net::Shutdown::Both).unwrap();
+                drop(stream);
             }
         });
         std::thread::spawn(move || {
@@ -240,7 +239,7 @@ impl MediaControllerApp {
             return "MUTED".to_string();
         }
         let volume = (self.get_volume)();
-        return format!("VOL: {}", Self::_progress(volume, full, half_full, empty));
+        format!("VOL: {}", Self::_progress(volume, full, half_full, empty))
     }
     fn _progress(percentage: u8, full: char, half_full: char, empty: char) -> String {
         assert!(percentage <= 100);
@@ -248,17 +247,16 @@ impl MediaControllerApp {
         let filled_count = progress as usize;
         let middle_count = (percentage != 100) as usize;
         let empty_count = 10_usize.saturating_sub(progress as usize).saturating_sub(1);
-        let progress_str = std::iter::repeat(full)
-            .take(filled_count)
-            .chain(
-                std::iter::repeat(if progress.ceil() - progress >= 0.5 {
+        let progress_str = std::iter::repeat_n(full, filled_count)
+            .chain(std::iter::repeat_n(
+                if progress.ceil() - progress >= 0.5 {
                     half_full
                 } else {
                     empty
-                })
-                .take(middle_count),
-            )
-            .chain(std::iter::repeat(empty).take(empty_count))
+                },
+                middle_count,
+            ))
+            .chain(std::iter::repeat_n(empty, empty_count))
             .collect::<String>();
         format!("{progress_str}{percentage:>4}%")
     }
